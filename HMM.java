@@ -38,7 +38,7 @@ public class HMM {
     }
 
     this.A= normalize(A);
-    printMatrix();
+   
 
     for (int i = 0; i < numberOfStates; ++i) {
       for (int j = 0; j < numberOfEmissions; ++j) {
@@ -50,10 +50,11 @@ public class HMM {
 
     for (int i = 0; i < numberOfStates; ++i) {
       this.pi[i] = Math.random()*(0.9-0.1)+0.1;
+      System.err.println("ooooo: "+ pi[i]);
     }
 
     this.pi = normalize(pi);
-
+     printMatrix();
   }
 
   public HMM(double[][] A, double[][] B, double[] pi){
@@ -433,6 +434,7 @@ public class HMM {
   }
 
   public void printMatrix(){
+    System.err.println("A");
     for (int i = 0; i < numberOfStates; ++i) {
       for (int j = 0; j < numberOfStates; ++j) {
                 System.err.print(this.A[i][j]+ "  ");
@@ -440,6 +442,23 @@ public class HMM {
 
        System.err.println("");
     }
+
+    System.err.println("B");
+    for (int i = 0; i < numberOfStates; ++i) {
+      for (int j = 0; j < numberOfEmissions; ++j) {
+                System.err.print(this.B[i][j]+ "  ");
+      }
+
+       System.err.println("");
+    }
+
+     System.err.println("Pi");
+     for (int i = 0; i < numberOfStates; i++) {
+         System.err.print(pi[i]+ "  ");
+      }
+   
+
+
   }
 
   public static double[][] normalize(double m[][]) {
@@ -458,11 +477,12 @@ public class HMM {
 }
 
   public static double[] normalize(double[] a) {
-    int sum = 0;
+    double sum =0.0;
     double[] a2 = new double[a.length];
     for (int i = 0; i < a.length; i++) {
       sum += a[i];       
     }
+    System.err.println("SUM "+ sum);
     for (int i = 0; i < a.length; i++) {
       a2[i] = a[i] * (1.0 / sum);       
     }
@@ -478,7 +498,25 @@ public class HMM {
       return sum;
     }
 
-
+  public double[] currentStateDistribution(int times) {
+    double[] s = new double[numberOfStates];
+    double[] sBefore = new double[numberOfStates];
+    sBefore = this.pi;
+    for (int k = 0; k < times; k++) {
+      for (int i = 0; i < numberOfStates; i++) {
+        for (int j = 0; j < numberOfStates; j++) {
+          s[i] += this.A[j][i] * sBefore[j];
+        }
+      }
+      sBefore = s;
+    }  
+     System.err.println("S");
+     for (int i = 0; i < numberOfStates; i++) {
+         System.err.print(s[i]+ "  ");
+      }
+   
+    return s;
+  }
   
 }
 

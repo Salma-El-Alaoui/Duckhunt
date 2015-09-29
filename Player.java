@@ -5,9 +5,10 @@ class Player {
     final int states = 5;
     final int species = Constants.COUNT_SPECIES;
     HMM[] models = new HMM[species];
+    HMM oneModel ;
     int numberBirds;
     int currentRound;
-    int start =2;
+    int start =3;
     int time;
 
     public Player() {
@@ -16,6 +17,7 @@ class Player {
         for (int i = 0; i < species; i++) {
             models[i] = new HMM(states, emissions);
         }
+        oneModel = new HMM(states, emissions);
     }
 
     /**
@@ -54,9 +56,9 @@ class Player {
         if (pState.getRound() > this.currentRound) {
             this.currentRound = pState.getRound();
         }
-        if (time < 70)
+        /*if (time < 30)
             return cDontShoot;
-    
+        */
 
         if(this.currentRound > start) {
             for (int i = 0; i < pState.getNumBirds(); i++){
@@ -92,26 +94,48 @@ class Player {
             obs[i] = bird.getObservation(i);
         }
 
+        
+        //HMM model = this.models[species];
 
-        HMM model = this.models[species];
-        System.err.println("SPECIES :"+ species);
-        //model.estimateModel(getObservations(bird));
+        HMM model = new HMM(states, emissions);
+        model.estimateModel(getObservations(bird));
+
+        if (this.time < 30){
+            model = this.models[species];
+           
+        }
+        
+
+        //System.err.println("SPECIES :"+ species);
+        
+       
+
+
         //model.printMatrix();
-
+        /*
         double[] probabilities = new double[Constants.COUNT_MOVE];
         for (int i = 0; i < Constants.COUNT_MOVE; i++) {
             obs[bird.getSeqLength()] = i;
 
             probabilities[i] = model.estimateProbabilityOfEmissionSequence(obs);
-            // System.err.println("PROBABILITY :"+ probabilities[i]);
+            System.err.println("PROBABILITY :"+ probabilities[i]);
         }
         for (int i = 0; i < probabilities.length; i++) {          
-            if (probabilities[i] > 0.5)
+            if (probabilities[i] > 0.6)
                 //System.err.println("PROBABILITY :"+ probabilities[i]);
                 return new Action(index, i);
         }
-
-        return null;
+        */
+        
+        double[] stateDistribution = model.currentStateDistribution(this.time);
+        double[] nextEmissions = model.estimateProbabilityDistributionOfNextEmission(stateDistribution);
+        for (int i = 0; i < nextEmissions.length; i++) {          
+            if (nextEmissions[i] > 0.7) {
+                System.err.println("PROBABILITY :"+ nextEmissions[i]);
+            }   return new Action(index, i);
+        }
+        
+        return  null;
     }
 
     public int getLikelySpecies(Bird bird) {
@@ -182,8 +206,8 @@ class Player {
         int[] lGuess = new int[pState.getNumBirds()];
         for (int i = 0; i < pState.getNumBirds(); ++i) {
             Bird bird = pState.getBird(i);
-            lGuess[i] = getLikelySpecies(bird);
-            //lGuess[i] = Constants.SPECIES_UNKNOWN;
+           lGuess[i] = getLikelySpecies(bird);
+           // lGuess[i] = Constants.SPECIES_UNKNOWN;
         }            
         return lGuess;
     }
@@ -216,6 +240,7 @@ class Player {
             this.models[pSpecies[i]].estimateModel(getObservations(bird));
             //printObservations(getObservations(bird));
             //System.err.println("Size2: "+ bird.getSeqLength() );
+            System.err.println("REESTIMATION");
             this.models[pSpecies[i]].printMatrix();
         }
 
@@ -223,4 +248,6 @@ class Player {
     }
 
     public static final Action cDontShoot = new Action(-1, -1);
+
+
 }
