@@ -8,7 +8,7 @@ import java.lang.Math;
  * We recommend that you read the article as an introduction to HMMs.
  */
 public class HMM {
-  static final int maxIters = 30; // Max iterations when estimating a new model.
+  static final int maxIters = 300; // Max iterations when estimating a new model.
   
   final int numberOfStates; // The number of states in the HMM.
   final int numberOfEmissions; // The number of emissions in the HMM.
@@ -50,11 +50,10 @@ public class HMM {
 
     for (int i = 0; i < numberOfStates; ++i) {
       this.pi[i] = Math.random()*(0.9-0.1)+0.1;
-      System.err.println("ooooo: "+ pi[i]);
     }
 
     this.pi = normalize(pi);
-     printMatrix();
+    // printMatrix();
   }
 
   public HMM(double[][] A, double[][] B, double[] pi){
@@ -482,7 +481,7 @@ public class HMM {
     for (int i = 0; i < a.length; i++) {
       sum += a[i];       
     }
-    System.err.println("SUM "+ sum);
+    //System.err.println("SUM "+ sum);
     for (int i = 0; i < a.length; i++) {
       a2[i] = a[i] * (1.0 / sum);       
     }
