@@ -1,25 +1,23 @@
-import java.util.ArrayList;
-
-
-class Player {
+import java.util.*;
+class Player2 {
 
     final int emissions = 9;
     final int states = 5;
     final int species = Constants.COUNT_SPECIES;
-
-    ArrayList<ArrayList> models =  new ArrayList<ArrayList>();
-
+    HMM[] models = new HMM[species];
+    HMM oneModel ;
     int numberBirds;
-    int currentRound = 0;
+    int currentRound;
     int start =2;
     int time;
 
-    public Player() {
+    public Player2() {
         
         //initialize our models
         for (int i = 0; i < species; i++) {
-            models.add(i, new ArrayList<HMM>());
+            models[i] = new HMM(states, emissions);
         }
+        oneModel = new HMM(states, emissions);
     }
 
     /**
@@ -38,11 +36,50 @@ class Player {
      * @return the prediction of a bird we want to shoot at, or cDontShoot to pass
      */
     public Action shoot(GameState pState, Deadline pDue) {
+        /*
+         * Here you should write your clever algorithms to get the best action.
+         * This skeleton never shoots.
+         */
+        
+        //get the number of birds in this state
+        //return the most likely action that matches the move for each bird
+            //
+            //
+            //
+       // for (int i = 0; i < pState.getNumBirds(); i++ ) {
+          //  Action a = getNextMove( )
+       // }
+       // 
+       // 
+        this.time++;
+        this.numberBirds = pState.getNumBirds();
+        if (pState.getRound() > this.currentRound) {
+            this.currentRound = pState.getRound();
+            this.time = 0;
+        }
 
-        this.currentRound = pState.getRound();
+        /*if (time < 35)
+            return cDontShoot;
+        */
+
+
+        if(this.currentRound > start) {
+            for (int i = 0; i < pState.getNumBirds() ; i++){
+                Action a = getNextMove(pState.getBird(i),i);
+                if (a != null){
+                    return a;
+                }
+            }
+            
+        }
+
+
+
         // This line chooses not to shoot.
         return cDontShoot;
 
+        // This line would predict that bird 0 will move right and shoot at it.
+        // return Action(0, MOVE_RIGHT);
     }
 
     public Action getNextMove(Bird bird, int index){
@@ -61,20 +98,20 @@ class Player {
         }
 
         
-//        HMM model = this.models[species];
-//
-//        if (time == 40)
-//            model.estimateModel(getObservations(bird));
-//        if (time == 50)
-//            model.estimateModel(getObservations(bird));
-//        if (time == 60)
-//            model.estimateModel(getObservations(bird));
-//        if (time == 70)
-//            model.estimateModel(getObservations(bird));
-//        if (time == 80)
-//            model.estimateModel(getObservations(bird));
-//        if (time == 90)
-//            model.estimateModel(getObservations(bird));
+        HMM model = this.models[species];
+
+        if (time == 40)
+            model.estimateModel(getObservations(bird));
+        if (time == 50)
+            model.estimateModel(getObservations(bird));
+        if (time == 60)
+            model.estimateModel(getObservations(bird));
+        if (time == 70)
+            model.estimateModel(getObservations(bird));
+        if (time == 80)
+            model.estimateModel(getObservations(bird));
+        if (time == 90)
+            model.estimateModel(getObservations(bird));
 
 
         //HMM model = new HMM(states, emissions);
@@ -83,21 +120,21 @@ class Player {
 
         //model.printMatrix();
         
-//       double[] probabilities = new double[Constants.COUNT_MOVE];
-//        for (int i = 0; i < Constants.COUNT_MOVE; i++) {
-//            obs[bird.getSeqLength()] = i;
-//
-//            probabilities[i] = model.estimateProbabilityOfEmissionSequence(obs);
-//            System.err.println("PROBABILITY :"+ probabilities[i]);
-//        }
-//
-//        probabilities = normalize(probabilities);
-//        for (int i = 0; i < probabilities.length; i++) {
-//            if (probabilities[i] > 0.65)
-//                return new Action(index, i);
-//                //System.err.println("PROBABILITY :"+ probabilities[i]);
-//        }
-//
+       double[] probabilities = new double[Constants.COUNT_MOVE];
+        for (int i = 0; i < Constants.COUNT_MOVE; i++) {
+            obs[bird.getSeqLength()] = i;
+
+            probabilities[i] = model.estimateProbabilityOfEmissionSequence(obs);
+            System.err.println("PROBABILITY :"+ probabilities[i]);
+        }
+
+        probabilities = normalize(probabilities);
+        for (int i = 0; i < probabilities.length; i++) {          
+            if (probabilities[i] > 0.65)
+                return new Action(index, i);
+                //System.err.println("PROBABILITY :"+ probabilities[i]);               
+        }
+    
         /*
         double[] stateDistribution = model.currentStateDistribution(this.time);
         double[] nextEmissions = model.estimateProbabilityDistributionOfNextEmission(stateDistribution);
@@ -115,38 +152,20 @@ class Player {
 
     public int getLikelySpecies(Bird bird) {
         //for each one of our models(for each species), return the one that maximises the probability of the observation sequence(for our bird) given the model.
-
-        if(this.currentRound == 0){
-            return 0;
-//          return  (int)(Math.random() * 5);
-
-        }
-
-        double bestOverallP = 0;
-        int bestSpecies = 0;
-
+        
+        double bestP = 0;
+        int bestIndex = 0;
         for (int i = 0; i < species; i++) {
-
-            double bestP = 0;
-            ArrayList<HMM> speciesArray = this.models.get(i);
-
-            for(int j = 0; j < speciesArray.size(); j++){
-
-                double p = speciesArray.get(j).estimateProbabilityOfEmissionSequence(getObservations(bird));
-
-                //System.err.println("P :"+ p);
-                if (bestP < p) {
-                    bestP = p;
-                }
-            }
-            if( bestP > bestOverallP ){
-                bestOverallP = bestP;
-                bestSpecies = i;
+            double p = this.models[i].estimateProbabilityOfEmissionSequence(getObservations(bird));
+             //System.err.println("P :"+ p);
+            if (bestP < p) {
+                bestP = p;
+                bestIndex = i;
             }
 
         }
 
-        return bestSpecies;
+        return bestIndex;
     }
 
     public int[] getObservations(Bird bird) {
@@ -203,8 +222,6 @@ class Player {
            // lGuess[i] = Constants.SPECIES_UNKNOWN;
         }            
         return lGuess;
-
-
     }
 
     /**
@@ -229,18 +246,22 @@ class Player {
      */
     public void reveal(GameState pState, int[] pSpecies, Deadline pDue) {
 
+        this.models = new HMM[species];
+
+         for (int i = 0; i < species; i++) {
+           models[i] = new HMM(states, emissions);
+            }
 
         for (int i = 0; i < pSpecies.length; i++) {
-
             Bird bird = pState.getBird(i);
-//            System.err.println("LENGTH BIRD"+i+ "  "+getObservations(bird).length);
-            int species = pSpecies[i];
-
-            HMM birdModel = new HMM(states, emissions);
-            birdModel.estimateModel(getObservations(bird));
-
-            this.models.get(species).add(birdModel);
-
+            System.err.println("LENGTH BIRD"+i+ "  "+getObservations(bird).length);
+            this.models[pSpecies[i]].estimateModel(getObservations(bird));
+            
+            
+            //printObservations(getObservations(bird));
+            //System.err.println("Size2: "+ bird.getSeqLength() );
+            //System.err.println("REESTIMATION");
+            //this.models[pSpecies[i]].printMatrix();
         }
 
 
@@ -249,19 +270,18 @@ class Player {
     public static final Action cDontShoot = new Action(-1, -1);
 
     public static double[] normalize(double[] a) {
-
-        double sum =0.0;
-        double[] a2 = new double[a.length];
-        for (int i = 0; i < a.length; i++) {
-          sum += a[i];
-        }
-        //System.err.println("SUM "+ sum);
-        for (int i = 0; i < a.length; i++) {
-          a2[i] = a[i] * (1.0 / sum);
-        }
-
-        return a2;
+    double sum =0.0;
+    double[] a2 = new double[a.length];
+    for (int i = 0; i < a.length; i++) {
+      sum += a[i];       
     }
+    //System.err.println("SUM "+ sum);
+    for (int i = 0; i < a.length; i++) {
+      a2[i] = a[i] * (1.0 / sum);       
+    }
+
+    return a2;
+  }
 
 
 
