@@ -1,7 +1,8 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
-class Player {
+class Player1 {
 
     final int emissions = 9;
     final int states = 5;
@@ -14,7 +15,7 @@ class Player {
     int start =2;
     int time = 0;
 
-    public Player() {
+    public Player1() {
         
         //initialize our models
         for (int i = 0; i < species; i++) {
@@ -51,9 +52,8 @@ class Player {
             return cDontShoot;
         }
 
-        if( currentRound > 0) {
+        if( currentRound > 0)
             return getNextMove(pState);
-        }
         return cDontShoot;
     }
 
@@ -64,41 +64,58 @@ class Player {
         int bestMoveOverall = -1;
         int bestBird = -1;
 
-        for( int i = 0; i < pState.getNumBirds(); i++) {
+        for( int i = 0; i < pState.getNumBirds(); i++){
 
-            if (pState.getBird(i).isDead()) {
+            if(pState.getBird(i).isDead()){
                 break;
             }
 
-            int species = getLikelySpecies(pState.getBird(i));
-            if (species == Constants.SPECIES_BLACK_STORK) {
+            int species =  getLikelySpecies(pState.getBird(i));
+            if( species == Constants.SPECIES_BLACK_STORK){
                 break;
             }
-
-
-
-//            double[] probArray = new double[Constants.COUNT_MOVE];
-
-            int[] obs = getObservations(pState.getBird(i));
-
-            HMM moveJ = new HMM(states, emissions);
-            moveJ.estimateModel(obs);
-
-            double[] stateDistribution = moveJ.currentStateDistribution(this.time);
-            double[] nextEmissions = moveJ.estimateProbabilityDistributionOfNextEmission(stateDistribution);
-
-            nextEmissions = normalize(nextEmissions);
-
 
             double bestProb = 0;
             int bestMove = 0;
+            double[] probArray = new double[Constants.COUNT_MOVE];
 
-            for (int j = 0; j < nextEmissions.length; j++) {
-                if (nextEmissions[j] > bestProb) {
-                    bestProb = nextEmissions[j];
+            int[] obs = getObservations(pState.getBird(i));
+            int[] obsNext = new int[obs.length+1];
+
+            for(int x = 0; x < obs.length; x++){
+                obsNext[x] = obs[x];
+            }
+
+
+            for(int j = 0; j < Constants.COUNT_MOVE; j++){
+
+                obsNext[obsNext.length-1] = j;
+
+                HMM moveJ = new HMM(states,emissions);
+                moveJ.estimateModel(obsNext);
+
+                probArray[j] = moveJ.estimateProbabilityOfEmissionSequence(obs);
+
+//                p = moveJ.estimateProbabilityOfEmissionSequence(obs);
+//                if( p > bestProb){
+//                    bestProb = p;
+//                    bestMove = j;
+//                }
+            }
+
+            probArray = normalize(probArray);
+
+            if( i == 0 ) {
+                for (double d : probArray) {
+                    System.err.print(" " + d);
+                }
+                System.err.println();
+            }
+
+            for(int j  = 0; j < probArray.length; j++){
+                if( probArray[j] > bestProb ){
+                    bestProb = probArray[j];
                     bestMove = j;
-
-//                    System.err.println("PROBABILITY :"+ nextEmissions[i]);
                 }
             }
 
@@ -110,10 +127,37 @@ class Player {
             }
         }
 
+        if( bestProbOverall > 0.9){
+            return new Action(bestBird, bestMoveOverall);
+        }
+        return cDontShoot;
 
-        return new Action(bestBird, bestMoveOverall);
-
-//        return cDontShoot;
+        
+//       double[] probabilities = new double[Constants.COUNT_MOVE];
+//        for (int i = 0; i < Constants.COUNT_MOVE; i++) {
+//            obs[bird.getSeqLength()] = i;
+//
+//            probabilities[i] = model.estimateProbabilityOfEmissionSequence(obs);
+//            System.err.println("PROBABILITY :"+ probabilities[i]);
+//        }
+//
+//        probabilities = normalize(probabilities);
+//        for (int i = 0; i < probabilities.length; i++) {
+//            if (probabilities[i] > 0.65)
+//                return new Action(index, i);
+//                //System.err.println("PROBABILITY :"+ probabilities[i]);
+//        }
+//
+        /*
+        double[] stateDistribution = model.currentStateDistribution(this.time);
+        double[] nextEmissions = model.estimateProbabilityDistributionOfNextEmission(stateDistribution);
+        nextEmissions = normalize(nextEmissions);
+        for (int i = 0; i < nextEmissions.length; i++) {          
+            if (nextEmissions[i] > 0.45) {
+                System.err.println("PROBABILITY :"+ nextEmissions[i]);
+            }   return new Action(index, i);
+        }
+        */
 
     }
 

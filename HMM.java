@@ -8,7 +8,7 @@ import java.lang.Math;
  * We recommend that you read the article as an introduction to HMMs.
  */
 public class HMM {
-  static final int maxIters = 300; // Max iterations when estimating a new model.
+  static final int maxIters = 30; // Max iterations when estimating a new model.
   
   final int numberOfStates; // The number of states in the HMM.
   final int numberOfEmissions; // The number of emissions in the HMM.
@@ -509,10 +509,10 @@ public class HMM {
       }
       sBefore = s;
     }  
-     System.err.println("S");
-     for (int i = 0; i < numberOfStates; i++) {
-         System.err.print(s[i]+ "  ");
-      }
+//     System.err.println("S");
+//     for (int i = 0; i < numberOfStates; i++) {
+//         System.err.print(s[i]+ "  ");
+//      }
    
     return s;
   }
