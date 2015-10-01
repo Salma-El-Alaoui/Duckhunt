@@ -283,6 +283,7 @@ class Player {
             int species = pSpecies[i];
 
             HMM birdModel = new HMM(states, emissions);
+//            birdModel.printMatrix();
             birdModel.estimateModel(getObservations(bird));
 
             this.models.get(species).add(birdModel);

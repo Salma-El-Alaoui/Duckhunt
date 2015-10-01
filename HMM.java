@@ -32,8 +32,9 @@ public class HMM {
     double sum = 0;
     double eps;
     for (int i = 0; i < numberOfStates; ++i) {
-      for (int j = 0; j < numberOfStates; ++j) {      
-        this.A[i][j] = Math.random()*(0.9-0.1)+0.1;
+      for (int j = 0; j < numberOfStates; ++j) {
+        this.A[i][j] = 1000 + Math.random()*10000;
+//        this.A[i][j] = Math.random()*(0.9-0.1)+0.1;
        // A[i][j] = 3 + Math.random()*(0.09-0.01)+0.01; 
         //  if (i == j)
          //   A[i][j] += 100 * numberOfStates;
@@ -45,7 +46,8 @@ public class HMM {
 
     for (int i = 0; i < numberOfStates; ++i) {
       for (int j = 0; j < numberOfEmissions; ++j) {
-        this.B[i][j] = Math.random()*(0.9-0.1)+0.1;
+        this.B[i][j] = 1000 + Math.random()*500;
+//        this.B[i][j] = Math.random()*(0.9-0.1)+0.1;
        // B[i][j] = 3 + Math.random()*(0.09-0.01)+0.01; 
           //if (i == j)
            // B[i][j] += 100 * numberOfStates;
@@ -57,7 +59,8 @@ public class HMM {
     this.B = normalize(B);
 
     for (int i = 0; i < numberOfStates; ++i) {
-      this.pi[i] = Math.random()*(0.9-0.1)+0.1;
+      this.pi[i] = 1000 + Math.random()*500;
+//      this.pi[i] = Math.random()*(0.9-0.1)+0.1;
       //this.pi[i] = 1 + Math.random()*(0.09-0.01)+0.01;
     }
 
@@ -462,7 +465,7 @@ public class HMM {
   }
 
   public void printMatrix(){
-    System.err.println("A");
+    System.err.println("\nA");
     for (int i = 0; i < numberOfStates; ++i) {
       for (int j = 0; j < numberOfStates; ++j) {
                 System.err.print(this.A[i][j]+ "  ");
@@ -471,7 +474,7 @@ public class HMM {
        System.err.println("");
     }
 
-    System.err.println("B");
+    System.err.println("\nB");
     for (int i = 0; i < numberOfStates; ++i) {
       for (int j = 0; j < numberOfEmissions; ++j) {
                 System.err.print(this.B[i][j]+ "  ");
@@ -480,10 +483,11 @@ public class HMM {
        System.err.println("");
     }
 
-     System.err.println("Pi");
+     System.err.println("\nPi");
      for (int i = 0; i < numberOfStates; i++) {
          System.err.print(pi[i]+ "  ");
       }
+    System.err.println("");
    
 
 
