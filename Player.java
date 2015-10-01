@@ -84,28 +84,49 @@ class Player {
             HMM moveJ = new HMM(states, emissions);
             moveJ.estimateModel(obs);
 
-            double[] stateDistribution = moveJ.currentStateDistribution(this.time);
-            double[] nextEmissions = moveJ.estimateProbabilityDistributionOfNextEmission(stateDistribution);
-
-            nextEmissions = normalize(nextEmissions);
-
+            double[] stateDistribution = moveJ.estimateStateDistribution(obs);
+            stateDistribution = normalize(stateDistribution);
+            double[] currentEmissions = moveJ.estimateProbabilityDistributionOfNextEmission(stateDistribution);
+            currentEmissions = normalize(currentEmissions);
 
             double bestProb = 0;
             int bestMove = 0;
 
-            for (int j = 0; j < nextEmissions.length; j++) {
-                if (nextEmissions[j] > bestProb) {
-                    bestProb = nextEmissions[j];
+            for (int j = 0; j < currentEmissions.length; j++) {
+                if (currentEmissions[j] > bestProb) {
+                    bestProb = currentEmissions[j];
                     bestMove = j;
+                }
+            }
 
-//                    System.err.println("PROBABILITY :"+ nextEmissions[i]);
+            int[] obsNext = new int[obs.length+1];
+            for(int k = 0; k < obs.length; k++){
+                obsNext[k] = obs[k];
+            }
+            obsNext[obsNext.length - 1] = bestMove;
+
+            double[] nextStateDistribution = moveJ.estimateStateDistribution(obsNext);
+            nextStateDistribution = normalize(nextStateDistribution);
+            double[] nextEmissions = moveJ.estimateProbabilityDistributionOfNextEmission(nextStateDistribution);
+            nextEmissions = normalize(nextEmissions);
+
+            double bestProbNext = 0;
+            int bestMoveNext = 0;
+
+            for (int j = 0; j < nextEmissions.length; j++) {
+                if (nextEmissions[j] > bestProbNext) {
+                    bestProbNext = nextEmissions[j];
+                    bestMoveNext = j;
                 }
             }
 
 
-            if( bestProb > bestProbOverall){
-                bestProbOverall = bestProb;
-                bestMoveOverall = bestMove;
+
+
+            //this is for all birds
+            if( bestProbNext > bestProbOverall){
+                bestProbOverall = bestProbNext;
+                bestMoveOverall = bestMoveNext;
                 bestBird = i;
             }
         }
@@ -287,6 +308,7 @@ class Player {
 
         return a2;
     }
+
 
 
 

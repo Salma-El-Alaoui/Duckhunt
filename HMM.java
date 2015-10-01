@@ -8,7 +8,7 @@ import java.lang.Math;
  * We recommend that you read the article as an introduction to HMMs.
  */
 public class HMM {
-  
+
   static final int maxIters = 30; // Max iterations when estimating a new model.
   final int numberOfStates; // The number of states in the HMM.
   final int numberOfEmissions; // The number of emissions in the HMM.
@@ -34,6 +34,9 @@ public class HMM {
     for (int i = 0; i < numberOfStates; ++i) {
       for (int j = 0; j < numberOfStates; ++j) {      
         this.A[i][j] = Math.random()*(0.9-0.1)+0.1;
+       // A[i][j] = 3 + Math.random()*(0.09-0.01)+0.01; 
+        //  if (i == j)
+         //   A[i][j] += 100 * numberOfStates;
       }
     }
 
@@ -43,6 +46,11 @@ public class HMM {
     for (int i = 0; i < numberOfStates; ++i) {
       for (int j = 0; j < numberOfEmissions; ++j) {
         this.B[i][j] = Math.random()*(0.9-0.1)+0.1;
+       // B[i][j] = 3 + Math.random()*(0.09-0.01)+0.01; 
+          //if (i == j)
+           // B[i][j] += 100 * numberOfStates;
+          //if(j >= numberOfStates)
+           // B[i][j] += 10;
       }
     }
 
@@ -50,6 +58,7 @@ public class HMM {
 
     for (int i = 0; i < numberOfStates; ++i) {
       this.pi[i] = Math.random()*(0.9-0.1)+0.1;
+      //this.pi[i] = 1 + Math.random()*(0.09-0.01)+0.01;
     }
 
     this.pi = normalize(pi);
@@ -133,6 +142,26 @@ public class HMM {
     return probability;
   }
   
+
+   public double[] estimateStateDistribution(int[] O){
+    double probability = 0.0;
+    double[][] alpha = new double[O.length][numberOfStates];
+    double[] stateDistribution = new double[numberOfStates];
+
+    for (int i = 0; i < numberOfStates; ++i) {
+      alpha[0][i]=pi[i]*B[i][O[0]];
+    }
+
+    for (int t = 1; t < O.length; ++t) {
+      for (int i = 0; i < numberOfStates; ++i) {
+        for (int j = 0; j < numberOfStates; ++j) {
+          alpha[t][i] += alpha[(t-1)][j]*A[j][i]*B[i][O[t]];
+        }
+      }
+    }
+    stateDistribution = alpha[O.length-1];
+    return stateDistribution;
+  }
   /**
    * Estimates the hidden states from which a sequence of emissions were
    * observed.
