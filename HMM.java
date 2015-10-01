@@ -9,7 +9,6 @@ import java.lang.Math;
  */
 public class HMM {
   static final int maxIters = 300; // Max iterations when estimating a new model.
-  
   final int numberOfStates; // The number of states in the HMM.
   final int numberOfEmissions; // The number of emissions in the HMM.
   
