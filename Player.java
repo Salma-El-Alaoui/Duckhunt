@@ -282,11 +282,14 @@ class Player {
 //            System.err.println("LENGTH BIRD"+i+ "  "+getObservations(bird).length);
             int species = pSpecies[i];
 
-            HMM birdModel = new HMM(states, emissions);
+            for(int j = 0; j < 8; j++){
+                HMM birdModel = new HMM(states, emissions);
 //            birdModel.printMatrix();
-            birdModel.estimateModel(getObservations(bird));
+                birdModel.estimateModel(getObservations(bird));
 
-            this.models.get(species).add(birdModel);
+                this.models.get(species).add(birdModel);
+
+            }
 
         }
 
