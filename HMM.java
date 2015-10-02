@@ -80,7 +80,7 @@ public class HMM {
         this.A[i][j] = A[i][j];
       }
     }
-    printMatrix();
+    
     for (int i = 0; i < numberOfStates; ++i) {
       for (int j = 0; j < numberOfEmissions; ++j) {
         this.B[i][j] = B[i][j];
@@ -380,6 +380,26 @@ public class HMM {
         finished = true;
       }
     }
+  }
+
+  public double[][] getA(){
+    double[][]result = new double[numberOfStates][numberOfStates];
+    for (int i = 0; i < numberOfStates; ++i){
+      for (int j = 0; j < numberOfStates; ++j){
+        result[i][j] = this.A[i][j];
+      }
+    }
+    return result;
+ } 
+
+  public double[][] getB(){
+    double[][]result = new double[numberOfStates][numberOfEmissions];
+    for (int i = 0; i < numberOfStates; ++i){
+      for (int j = 0; j < numberOfEmissions; ++j){
+        result[i][j] = this.B[i][j];
+      }
+    }
+    return result;
   }
 
   /**
