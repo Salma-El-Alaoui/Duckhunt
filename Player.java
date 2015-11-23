@@ -67,12 +67,12 @@ class Player {
         for( int i = 0; i < pState.getNumBirds(); i++) {
 
             if (pState.getBird(i).isDead()) {
-                break;
+                continue;
             }
 
             int species = getLikelySpecies(pState.getBird(i));
             if (species == Constants.SPECIES_BLACK_STORK) {
-                break;
+                continue;
             }
 
 
@@ -99,7 +99,9 @@ class Player {
                 }
             }
 
-            int[] obsNext = new int[obs.length+1];
+
+
+           /* int[] obsNext = new int[obs.length+1];
             for(int k = 0; k < obs.length; k++){
                 obsNext[k] = obs[k];
             }
@@ -119,7 +121,7 @@ class Player {
                     bestMoveNext = j;
                 }
             }
-
+            
 
 
 
@@ -127,6 +129,13 @@ class Player {
             if( bestProbNext > bestProbOverall){
                 bestProbOverall = bestProbNext;
                 bestMoveOverall = bestMoveNext;
+                bestBird = i;
+            }*/
+
+            //this is for all birds
+            if( bestProb > bestProbOverall){
+                bestProbOverall = bestProb;
+                bestMoveOverall = bestMove;
                 bestBird = i;
             }
         }
@@ -186,11 +195,10 @@ class Player {
         }
 
 
-//        if( currentRound < 3 ){
-//            if( bestOverallP < 0.5){
-//                bestSpecies = 0;
-//            }
-//        }
+            if( bestOverallP < 0.5){
+                bestSpecies = 5;
+           }
+       
 
 
         return bestSpecies;
